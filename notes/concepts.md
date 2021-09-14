@@ -28,6 +28,9 @@
       - [Using MERGE to Combine Tables](#using-merge-to-combine-tables)
       - [Organize Responses with ORDER BY](#organize-responses-with-order-by)
       - [JOIN](#join)
+        - [Inner vs Outer Join](#inner-vs-outer-join)
+      - [GROUP BY](#group-by)
+        - [Show Duplicates and Print Records](#show-duplicates-and-print-records)
       - [Useful Functions](#useful-functions)
         - [DISTINCT](#distinct)
         - [COUNT](#count)
@@ -247,7 +250,78 @@ JOIN states
 ON people.state=states.state_abbrev;
 ```
 
-**NOTE**: If you drop the `ON` clause it will instead return a duplicate result for every record in the states table for every record of the people table.
+**NOTE**: If you drop the `ON` clause it will instead return a duplicate result for every record in the states table for every record of the people table. That is to say we get one of every row for the second table for each record on the first table. This would be called a *cross join*.
+
+You can select multiple columns and then query the resulting table as if it were a new table:
+
+```sql
+SELECT * 
+FROM people 
+JOIN states 
+ON people.state=states.state_abbrev 
+WHERE people.first_name LIKE 'j%' AND states.region='South';
+```
+
+If you want to join with a third table you would add another `JOIN` clause before the `WHERE` clause.
+
+##### Inner vs Outer Join
+
+An *inner join* asks for records that overlap. For example here, all of the records with matching states are part of the inner join (CA and VA) in this case. MA and DE are part of the outer join because they do not match. You can see that in the result on the right are only the results of the *inner join*.
+
+![](images/2021-09-14-08-52-23.png)
+
+A *left (outer) join* would get you all the records from the first table but would fill the values from the second table with null if no match were available.
+
+![](images/2021-09-14-08-55-47.png)
+
+You can flip that with a *right (outer) join*.
+
+![](images/2021-09-14-08-56-54.png)
+
+Finally is a *full outer join* which does the same thing as *left join* and *right join* combined.
+
+![](images/2021-09-14-08-58-01.png)
+
+#### GROUP BY
+
+Used to group things by a specific column. Ex: Country.
+
+```sql
+USE 单词卡
+SELECT 拼音
+FROM 我的單詞卡
+GROUP BY 拼音
+```
+
+Show duplicates in my Chinese flashcards
+
+```sql
+USE 单词卡
+SELECT 拼音, COUNT(拼音) as Count
+FROM 我的單詞卡
+GROUP BY 拼音
+HAVING COUNT(拼音)>1
+```
+
+##### Show Duplicates and Print Records
+
+```sql
+/*
+  First we select everything with SELECT * from the below table which we are creating.
+  Next we specify a variable name for the full 單詞卡 table and call it 'a'. Next we
+  create table b by using the statement starting with SELECT 拼音. Everything in those
+  parenthesis is table b. Finally with the ON clause we specify that we want the join
+  to occur when table a's (單詞卡) 拼音 column is the same as table b.
+*/
+USE 单词卡
+SELECT *
+FROM 我的單詞卡 a
+JOIN (SELECT 拼音, COUNT(拼音) as Count
+FROM 我的單詞卡
+GROUP BY 拼音
+HAVING COUNT(拼音)>1) b
+ON a.拼音 = b.拼音
+```
 
 #### Useful Functions
 
