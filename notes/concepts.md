@@ -34,6 +34,8 @@
       - [Useful Functions](#useful-functions)
         - [DISTINCT](#distinct)
         - [COUNT](#count)
+        - [SUBSTER](#subster)
+        - [CAST](#cast)
     - [Understanding Relational Database Concepts](#understanding-relational-database-concepts)
       - [Relationships](#relationships)
       - [Indices](#indices)
@@ -323,6 +325,21 @@ HAVING COUNT(拼音)>1) b
 ON a.拼音 = b.拼音
 ```
 
+We can do something like only display 繁體字 and 拼音 by doing this instead:
+
+```sql
+USE 单词卡
+SELECT 繁體字, a.拼音
+FROM 我的單詞卡 a
+JOIN (SELECT 拼音, COUNT(拼音) as Count
+FROM 我的單詞卡
+GROUP BY 拼音
+HAVING COUNT(拼音)>1) b
+ON a.拼音 = b.拼音
+```
+
+**NOTE:** If you drop the a. from 拼音 you will get the error "Ambiguous column name" because then it won't know from where to take 拼音 - table a? Or table b? So you have to specify.
+
 #### Useful Functions
 
 ##### DISTINCT
@@ -337,6 +354,22 @@ SELECT DISTINCT(first_name) FROM people;
 
 ```sql
 SELECT COUNT(*) FROM people WHERE state='CA';
+```
+
+##### SUBSTER
+
+Only display a substring:
+
+```sql
+SELECT LOWER(first_name), SUBSTR(last_name, -4)
+FROM people;
+```
+
+##### CAST
+Cast from one datatype to another:
+
+```sql
+SELECT CAST(some_integer AS CHAR)
 ```
 
 ### Understanding Relational Database Concepts
